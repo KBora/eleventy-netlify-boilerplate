@@ -1,27 +1,29 @@
 ---
-title: This is my first post
-date: 2015-01-01T00:00:00.000Z
+title: Uninstalling Angular's service worker
+date: 2020-09-05T11:30:58.697Z
 author: John Appleseed
-summary: Why contemplating our mortality can be a powerful catalyst for change
+summary: How to uninstall Angular's service worker from client machines
 tags:
-  - tech
-  - environment
-  - politics
-  - sport
+  - angular
+  - service worker
+  - javascript
 ---
-Leverage agile frameworks to provide a robust synopsis for high level overviews. Iterative approaches to corporate strategy foster collaborative thinking to further the overall value proposition. Organically grow the holistic world view of disruptive innovation via workplace diversity and empowerment.
+The default service worker that Angular provides can be difficult to uninstall once it is registered on client browsers
 
-Bring to the table win-win survival strategies to ensure proactive domination. At the end of the day, going forward, a new normal that has evolved from generation X is on the runway heading towards a streamlined cloud solution. User generated content in real-time will have multiple touchpoints for offshoring.
+### Turning on the service worker
 
-## Section Header
+Steps.
 
-Capitalize on low hanging fruit to identify a ballpark value added activity to beta test. Override the digital divide with additional clickthroughs from DevOps. Nanotechnology immersion along the information highway will close the loop on focusing solely on the bottom line.
+### Removing the service worker
 
-``` text/2-3
-// this is a command
-function myCommand() {
-	let counter = 0;
-	counter++;
-}
-```
-Organically grow the holistic world view of disruptive innovation via workplace diversity and empowerment.
+If you have turned on the service worker via Angular configuration, the easiest way to deregister the service worker from client browsers is to update this configuration. 
+
+\[Instructions]
+
+The service worker files (ngsw.json, service-worker.js, safety-worker.js) will not be generated in the build.
+
+The next time the client machine opens the page, the service worker will attempt to hit the ngsw.json file. Since that file is no longer there, it should return a 404, and the service worker should de-register itself. 
+
+#### Issue when servers don't return a 404 for missing assets
+
+Sometimes the server is configured to catch 404s and return something else, eg the index.html page (200). One case where this can happen is if the server is hosted on an S3 bucket, using the hash location strategy and requiring CloudFront to trap all 404s and redirect to the index.html, returning a 200.  In this case, the service worker will not de-register itself.  This can especially bad because the service worker will remain on the client machine, and keep the old version of the site indefinitely and display it each time the site is initially loaded. The page will update itself on manual refresh, but each time the user visits the site after they close the browser or in a new tab, they will see the old version
